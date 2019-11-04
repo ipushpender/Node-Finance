@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Withdrawal Reconciliation</title>
+</head>
+<style>
+    .w15 {
+        width: 15%;
+    }
+
+
+
+    ::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+    }
+
+    /*
+    .popup-div {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        top: 0
+    }
+
+    .progress {
+        width: 150px;
+        height: 150px;
+        background: none;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        margin-left: -75px;
+        margin-top: -75px;
+    }
+
+    .progress::after {
+        content: "";
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 6px solid #eee;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .progress>span {
+        width: 50%;
+        height: 100%;
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+        z-index: 1;
+    }
+
+    .progress .progress-left {
+        left: 0;
+    }
+
+    .progress .progress-bar {
+        width: 100%;
+        height: 100%;
+        background: none;
+        border-width: 6px;
+        border-style: solid;
+        position: absolute;
+        top: 0;
+    }
+
+     .progress .progress-left .progress-bar {
+        left: 100%;
+        border-top-right-radius: 80px;
+        border-bottom-right-radius: 80px;
+        border-left: 0;
+        -webkit-transform-origin: center left;
+        transform-origin: center left;
+    }
+
+    .progress .progress-right {
+        right: 0;
+    }
+
+    .progress .progress-right .progress-bar {
+        left: -100%;
+        border-top-left-radius: 80px;
+        border-bottom-left-radius: 80px;
+        border-right: 0;
+        -webkit-transform-origin: center right;
+        transform-origin: center right;
+    }
+
+    .progress .progress-value {
+        position: absolute;
+        top: 0;
+        left: 0;
+    } */
+</style>
+
+<body>
+    <div class="loader" style="display: none"></div>
+    <nav class="navbar navbar-light bg-light">
+        <a href="/main_page">
+            <h3 style="float:left;"><span class="badge badge-info">Back To Dashboard</span></h3>
+        </a>
+        <span class="navbar-brand mb-0 h1" style="margin:auto">Withdrawal Reconciliation</span>
+        <a href="/users/reset_password" style="margin-right:1%">
+            <h4 style="float:right;"><span class="badge badge-secondary">Reset Password</span></h4>
+        </a>
+        <a href="/signout">
+            <h4 style="float:right;"><span class="badge badge-secondary">Logout</span></h4>
+        </a>
+    </nav>
+    <div class="row">
+        <div class="col-md-12" style="text-align: center;">
+            <input type="button" class="btn btn-danger" onClick="window.location.reload();" value="Reset">
+        </div>
+    </div>
+    <input type="hidden" id="type_click" value="">
+    <input type="hidden" id="parse_status" value="">
+    <div class="col-md-12 upload_files">
+        <div class="row">
+            <div class="col-md-4">
+                <form id="AdminForm" class="col-md-12" method="POST" enctype="multipart/form-data">
+                    <fieldset>
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12" style="text-align: center;"> Admin File</div>
+                                <div class="col-md-12" style="margin:auto">
+                                    <div class="col-md-8" style="margin:auto">
+                                        <div class="input-group">
+                                            <!-- <input type="hidden" id="filename" name="filename" value=""> -->
+                                            <input type="file" id="admin_filename" name="admin_filename"
+                                                class="form-control form-control-sm"
+                                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                            <div class="input-group-btn">
+                                                <input type="submit" value="Upload"
+                                                    class="rounded-0 btn btn-primary 1_disable" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class=" col-md-4"></div>
+                                </div>
+                                <div class="col-md-12 admin_prog" style="margin:auto">
+                                    <div class="row">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="admin_progress_bar">
+                                                        <div class="AdminprogressBar" data-value="0"
+                                                            style="display: block;"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <i>
+                                                            <h6 class="admin_parsing" style="display: none;">Parsing....
+                                                            </h6>
+                                                        </i></div>
+                                                </div>
+                                                <div class="col-md-4"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row admin_ddn" style="visibility:hidden;">
+                                    <div class="form-group col-md-4">
+                                        <label for="file_1">Cash Free Id :</label>
+                                        <select class="form-control admin " id="file_1">
+
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="file_2">Bank Id :</label>
+                                        <select class="form-control admin" id="file_2">
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="file_3">Amount :</label>
+                                        <select class="form-control admin" id="file_3">
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+
+
+            <div class="col-md-4">
+                <form id="CashFreeForm" class="col-md-12" method="POST" enctype="multipart/form-data">
+                    <fieldset>
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12" style="text-align: center;"> CashFree File</div>
+                                <div class="col-md-12" style="margin:auto">
+
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-8" style="margin:auto">
+                                        <div class="input-group">
+                                            <!-- <input type="hidden" id="filename" name="filename" value=""> -->
+                                            <input type="file" id="cashfree_filename" name="cashfree_filename"
+                                                class="form-control form-control-sm"
+                                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                            <div class="input-group-btn">
+                                                <input type="submit" value="Upload"
+                                                    class="rounded-0 btn btn-primary 2_disable" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12 cashfree_prog" style="margin:auto">
+                                    <div class="row">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="cashfree_progress_bar">
+                                                        <div class="CashfreeprogressBar" data-value="0"
+                                                            style="display: block;"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <i>
+                                                            <h6 class="cashfree_parsing" style="display: none;">
+                                                                Parsing....</h6>
+                                                        </i></div>
+                                                </div>
+                                                <div class="col-md-4"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row cashfree_ddn" style="visibility:hidden;">
+                                    <div class="form-group col-md-2"> </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="cash_1">Cash Free Id :</label>
+                                        <select class="form-control  cash" id="cash_1">
+
+                                        </select>
+                                    </div>
+
+
+
+                                    <div class="form-group col-md-4">
+                                        <label for="cash_2">Amount :</label>
+                                        <select class="form-control cash " id="cash_2">
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2"> </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <form id="BankForm" class="col-md-12" method="POST" enctype="multipart/form-data">
+                    <fieldset>
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-12" style="text-align: center;"> Bank File</div>
+                                <div class="col-md-12" style="margin:auto">
+
+
+                                    <div class="col-md-8" style="margin:auto">
+                                        <div class="input-group">
+                                            <!-- <input type="hidden" id="filename" name="filename" value=""> -->
+                                            <input type="file" id="bank_filename" name="bank_filename"
+                                                class="form-control form-control-sm"
+                                                accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                            <div class="input-group-btn">
+                                                <input type="submit" value="Upload"
+                                                    class="rounded-0 btn btn-primary 3_disable" disabled>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4"></div>
+                                </div>
+                                <div class="col-md-12 bank_prog" style="margin:auto">
+                                    <div class="row">
+                                        <div class="col-md-4"></div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="bank_progress_bar">
+                                                        <div class="BankprogressBar" data-value="0"
+                                                            style="display: block;"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <i>
+                                                            <h6 class="bank_parsing" style="display: none;">
+                                                                Parsing....</h6>
+                                                        </i></div>
+                                                </div>
+                                                <div class="col-md-4"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row bank_ddn" style="visibility:hidden;">
+                                    <div class="form-group col-md-2"></div>
+                                    <div class="form-group col-md-4">
+                                        <label for="bank_1">Bank Id :</label>
+                                        <select class="form-control bank" id="bank_1">
+
+                                        </select>
+                                    </div>
+
+
+
+                                    <div class="form-group col-md-4">
+                                        <label for="bank_2">Amount :</label>
+                                        <select class="form-control bank" id="bank_2">
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+        <input type="hidden" id="file1" value="">
+        <input type="hidden" id="file2" value="">
+        <input type="hidden" id="file3" value="">
+        <input type="hidden" id="parse_status" value="">
+        <hr style="width: 90%;margin:auto;margin-bottom: 20px;" id="hr">
+
+        <div class="row reconcile_button">
+            <div class="col-md-12 prog_text_div"
+                style="color:grey; display: none;text-align: center;margin-left: 1%;margin-bottom: 1%;">
+                Progress
+                <span class="prog_text">0</span>%</div>
+            <div class="col-md-12" style="text-align: center; margin-bottom: -1%; margin-left: 1%;">
+                <input type="button" class="btn btn-success " id="compare" value="Reconcile" onclick="calling_fun()">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="row " id="table_reconcile" style="display: none;margin-left: 0%;position:relative;">
+            <div class="col-md-12" style="margin: auto;">
+                <!-- <div class="table-responsive col-sm-4" style="float:left;" id="table_1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5 style="text-align: center">
+                                <span class="badge badge-success">CashFree Transactions</span>
+                            </h5>
+
+                            <div class="row" style="padding: 1%;">
+
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary">
+                                        Count: <span class="badge badge-light" id="total_cashfree_match">88742</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary" style="float:right;">
+                                        Amount:<span data-toggle="tooltip" title="" id="cashfree_tooltip">
+                                            <span class="badge badge-light" id="cashfree_total">267549330</span></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <span style="float: right">
+                                        <a href="/withdraw/cashfree.csv" id="cashfree_download" download="CashFree.csv">
+                                            <input type="button" class="btn-sm btn btn-Info" value="Download">
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-condensed" style="margin-bottom: 0px;">
+
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="w15">Transaction Id</th>
+                                        <th scope="col" class="w15">Amount</th>
+                                        <th scope="col" class="w15">Diffrence</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="col-md-12" style="height:390px;overflow-y:auto;">
+                            <table class="table table-bordered table-condensed">
+
+                                <tbody id="cashfree_csv">
+                                    <tr>
+                                        <td class="w15">641514</td>
+                                        <td class="w15">100</td>
+                                        <td class="w15">0</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="w15">641515</td>
+                                        <td class="w15">300</td>
+                                        <td class="w15">0</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="table-responsive col-sm-4" style="float:left;" id="table_1">
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <h5 style="text-align: center">
+                                <span class="badge badge-success">CashFree Transactions</span>
+                            </h5>
+
+                            <div class="row" style="padding: 1%;">
+
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary">
+                                        Count: <span class="badge badge-light" id="total_cashfree_match">0</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary" style="float:right;">
+                                        Amount:<span data-toggle="tooltip" title="" id="cashfree_tooltip">
+                                            <span class="badge badge-light" id="cashfree_total">0</span></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <span style="float: right">
+                                        <a href="javascript:void(0)" id="cashfree_download" download="CashFree.csv">
+                                            <input type="button" class="btn-sm btn btn-Info" value="Download">
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <table class="table table-bordered table-condensed" style="margin-bottom: 0px;">
+
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="w15">Transaction Id</th>
+                                        <th scope="col" class="w15">Amount</th>
+                                        <th scope="col" class="w15">Diffrence</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class='col-md-12' style="height:390px;overflow-y:auto;">
+                            <table class="table table-bordered table-condensed">
+                                <tbody id="cashfree_csv">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive col-sm-4" style="float:left;" id="table_2">
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <h5 style="text-align: center">
+                                <span class="badge badge-success">Admin Transactions</span>
+                            </h5>
+
+                            <div class="row" style="padding: 1%;">
+
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary">
+                                        Count: <span class="badge badge-light" id="total_admin_match">0</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary" style="float:right;">
+                                        Amount:<span data-toggle="tooltip" title="" id="admin_tooltip">
+                                            <span class="badge badge-light" id="admin_same_total">0</span></span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <span style="float: right">
+                                        <a href="javascript:void(0)" id="admin_download" download="Admin.csv">
+                                            <input type="button" class="btn-sm btn btn-Info" value="Download">
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <table class="table table-bordered table-condensed" style="margin-bottom: 0px;">
+
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="w15">Transaction Id</th>
+                                        <th scope="col" class="w15">Amount</th>
+                                        <th scope="col" class="w15">Diffrence</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class='col-md-12' style="height:390px;overflow-y:auto;">
+                            <table class="table table-bordered table-condensed">
+
+                                <tbody id="admin_csv">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive col-sm-4" style="float:right;" id="table_3">
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <h5 style="text-align: center">
+                                <span class="badge badge-success"> Bank Transactions</span>
+                            </h5>
+                            <div class="row" style="padding: 1%;">
+
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary">
+                                        Count : <span class="badge badge-light" id="total_bank_match">0</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-sm btn-primary" style="float:right;">
+                                        Amount :<span data-toggle="tooltip" title="" id="bank_tooltip">
+                                            <span class="badge badge-light" id="bank_total">0</span></span>
+                                    </button>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <span style="float: right">
+                                        <a href="javascript:void(0)" id="bank_download" download="Bank.csv">
+                                            <input type="button" class="btn-sm btn btn-Info" value="Download">
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <table class="table table-bordered table-condensed" style="margin-bottom: 0px;">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="w15">Transaction Id</th>
+                                        <th scope="col" class="w15">Amount</th>
+                                        <th scope="col" class="w15">Diffrence</th>
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
+                        <div class='col-md-12' style="height:390px;overflow-y:auto;">
+                            <table class="table table-bordered table-condensed">
+
+                                <tbody id="bank_csv">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-div" style="display: none">
+        <!-- ============================= -->
+        <div class="progress auto_progress" data-value='0'>
+            <span class="progress-left">
+                <span class="progress-bar border-primary"></span>
+            </span>
+            <span class="progress-right">
+                <span class="progress-bar border-primary"></span>
+            </span>
+            <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                <div class="h2 font-weight-bold ifzero"><span class="prog_val">0</span><sup class="small">%</sup></div>
+            </div>
+        </div>
+        <!-- =============================================== -->
+    </div>
+</body>
+<script src="/javascripts/jquery.min.js"></script>
+<!-- <script src="../javascripts/loading-bar.js"></script> -->
+<script>
+    // =======================file upload progress bar=========================
+    // function _(el) {
+    //     console.log("inside el" + el)
+    //     return document.getElementById(el);
+    // }
+
+    // function admin_progres() {
+    //     console.log("111111111")
+    //     $("#type_click").val(1);
+    //     let prog = new ldBar(".AdminprogressBar");
+    //     prog.set(0)
+    //     $(".AdminprogressBar ,.admin_progress_bar").css({
+    //         "display": "block",
+    //     });
+    //     $(".admin_parsing").css("display", "none");
+    //     $(".admin_ddn").css({
+    //         "visibility": "hidden"
+    //     });
+    //     var file = _("admin_filename").files[0];
+    //     // alert(file.name+" | "+file.size+" | "+file.type);
+    //     var formdata = new FormData();
+    //     formdata.append("admin_filename", file);
+    //     var ajax = new XMLHttpRequest();
+    //     ajax.upload.addEventListener("progress", progressHandler, false);
+    //     ajax.addEventListener("load", completeHandler, false);
+    //     ajax.addEventListener("error", errorHandler, false);
+    //     ajax.addEventListener("abort", abortHandler, false);
+    //     ajax.open("POST", "/withdraw/admin_file_upload");
+    //     ajax.send(formdata);
+    // }
+
+    // function cashfree_progres() {
+    //     console.log("ttttttttt")
+    //     $("#type_click").val(2);
+    //     let prog = new ldBar(".CashfreeprogressBar");
+    //     prog.set(0)
+    //     $(".CashfreeprogressBar ,.cashfree_progress_bar").css({
+    //         "display": "block",
+    //     });
+    //     $(".cashfree_parsing").css("display", "none");
+    //     $(".cashfree_ddn").css({
+    //         "visibility": "hidden"
+    //     });
+    //     var file = _("cashfree_filename").files[0];
+    //     // alert(file.name+" | "+file.size+" | "+file.type);
+    //     var formdata = new FormData();
+    //     formdata.append("cashfree_filename", file);
+    //     var ajax = new XMLHttpRequest();
+    //     ajax.upload.addEventListener("progress", progressHandler, false);
+    //     ajax.addEventListener("load", completeHandler, false);
+    //     ajax.addEventListener("error", errorHandler, false);
+    //     ajax.addEventListener("abort", abortHandler, false);
+    //     ajax.open("POST", "/withdraw/cashfree_file_upload");
+    //     ajax.send(formdata);
+    // }
+
+    // function bank_progres() {
+    //     $("#type_click").val(3);
+    //     let prog = new ldBar(".BankprogressBar");
+    //     prog.set(0)
+    //     $(".BankprogressBar ,.bank_progress_bar").css({
+    //         "display": "block",
+    //     });
+    //     $(".bank_parsing").css("display", "none");
+    //     $(".bank_ddn").css({
+    //         "visibility": "hidden"
+    //     });
+    //     var file = _("bank_filename").files[0];
+    //     // alert(file.name+" | "+file.size+" | "+file.type);
+    //     var formdata = new FormData();
+    //     formdata.append("bank_filename", file);
+    //     var ajax = new XMLHttpRequest();
+    //     ajax.upload.addEventListener("progress", progressHandler, false);
+    //     ajax.addEventListener("load", completeHandler, false);
+    //     ajax.addEventListener("error", errorHandler, false);
+    //     ajax.addEventListener("abort", abortHandler, false);
+    //     ajax.open("POST", "/withdraw/bank_file_upload");
+    //     ajax.send(formdata);
+    // }
+
+    // function progressHandler(event) {
+    //     console.log("pppppppppp")
+    //     var bar = '';
+    //     if ($("#type_click").val() == 1) {
+    //         bar = ".AdminprogressBar";
+    //         parse_val = ".admin_parsing";
+    //     } else if ($("#type_click").val() == 2) {
+    //         bar = ".CashfreeprogressBar";
+    //         parse_val = ".cashfree_parsing";
+    //     } else if ($("#type_click").val() == 3) {
+    //         bar = ".BankprogressBar";
+    //         parse_val = ".bank_parsing";
+    //     }
+    //     let progressBar = new ldBar(bar);
+    //     let percent = (event.loaded / event.total) * 100;
+    //     console.log("inside percent",percent);
+    //     progressBar.set(Math.round(percent));
+    //     if (Math.round(percent) == 100) {
+    //         $(bar).css({
+    //             "display": "none"
+    //         });
+    //         $(parse_val).css({
+    //             "display": "block"
+    //         });
+
+    //     }
+    // }
+
+    // function completeHandler(event) {
+    //     console.log("333333333333333")
+    //     var parse_val = '';
+    //     if ($("#type_click").val() == 1) {
+    //         bar = ".AdminprogressBar"
+    //         parse_val = ".admin_parsing"
+    //     } else if ($("#type_click").val() == 2) {
+    //         bar = ".CashfreeprogressBar"
+    //         parse_val = ".cashfree_parsing"
+    //     } else if ($("#type_click").val() == 3) {
+    //         bar = ".BankprogressBar";
+    //         parse_val = ".bank_parsing";
+    //     }
+    //     console.log("inside completeHandler")
+    //     $(bar).css({
+    //         "display": "none",
+
+    //     });
+    //     $(parse_val).css({
+    //         "display": "block"
+    //     });
+    //     if ($("#parse_status").val() == 1) {
+    //         $(parse_val).css({
+    //             "display": "none"
+    //         });
+    //     }
+    // }
+
+    // function errorHandler(event) {
+    //     console.log("44444444444")
+    //     if ($("#type_click").val() == 1) {
+    //         bar = ".AdminprogressBar"
+    //         parse_val = ".admin_parsing"
+    //     } else if ($("#type_click").val() == 2) {
+    //         bar = ".CashfreeprogressBar"
+    //         parse_val = ".cashfree_parsing"
+    //     } else if ($("#type_click").val() == 3) {
+    //         bar = ".BankprogressBar";
+    //         parse_val = ".bank_parsing";
+    //     }
+    //     $(bar).css("display", "none");
+    //     $(parse_val).css({
+    //         "display": "none"
+    //     });
+    // }
+
+    // function abortHandler(event) {
+    //     if ($("#type_click").val() == 1) {
+    //         bar = ".AdminprogressBar"
+    //         parse_val = ".admin_parsing"
+    //     } else if ($("#type_click").val() == 2) {
+    //         bar = ".CashfreeprogressBar"
+    //         parse_val = ".cashfree_parsing"
+    //     } else if ($("#type_click").val() == 3) {
+    //         bar = ".BankprogressBar";
+    //         parse_val = ".bank_parsing";
+    //     }
+    //     $(bar).css("display", "none");
+    //     $(parse_val).css({
+    //         "display": "none"
+    //     });
+    // }
+    // =======================file upload progress bar=========================
+
+
+    $("#AdminForm").on('submit', (function (e) {
+        $(".admin_parsing").css({
+            "display": "block"
+        });
+        e.preventDefault();
+        $("#parse_status").val(0);
+        let formData = new FormData(this);
+        $.ajax({
+            url: '/withdraw/admin_file_upload',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                // console.log("data", data)
+                // console.log("path", data.path)
+                // console.log("header", data.header)
+                $(".admin_ddn").css({
+                    "visibility": "visible"
+                });
+                $("#parse_status").val(1)
+                $(".admin_parsing").css({
+                    "display": "none"
+                });
+                $(".admin").html(data.header)
+                // $("#file1").val(data.path)
+                // console.log("7777777777777")
+            },
+            error: function (err) {
+                $(".admin_parsing").css({
+                    "display": "none"
+                });
+                console.log("errou", err)
+            }
+        })
+    }))
+    $("#CashFreeForm").on('submit', (function (e) {
+        $(".cashfree_parsing").css({
+            "display": "block"
+        });
+        e.preventDefault();
+        $("#parse_status").val(0);
+        let formData = new FormData(this);
+        $.ajax({
+            url: '/withdraw/cashfree_file_upload',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                // console.log("data", data)
+                // console.log("path", data.path)
+                // console.log("header", data.header)
+
+                $("#parse_status").val(1)
+                $(".cashfree_parsing").css({
+                    "display": "none"
+                });
+                $(".cashfree_ddn").css({
+                    "visibility": "visible"
+                });
+                // $("#file2").val(data.path)
+                $(".cash").html(data.header)
+            },
+            error: function (err) {
+                $(".cashfree_parsing").css({
+                    "display": "none"
+                });
+                console.log("err", err)
+            }
+        })
+    }))
+    $("#BankForm").on('submit', (function (e) {
+        $(".bank_parsing").css({
+            "display": "block"
+        });
+        $("#parse_status").val(0);
+        e.preventDefault();
+        let formData = new FormData(this);
+        $.ajax({
+            url: '/withdraw/bank_file_upload',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                // $("#file3").val(data.path)
+                $(".bank").html(data.header)
+                $(".bank_ddn").css({
+                    "visibility": "visible"
+                });
+                $("#parse_status").val(1);
+                $(".bank_parsing").css({
+                    "display": "none"
+                });
+            },
+            error: function (err) {
+                $(".bank_parsing").css({
+                    "display": "none"
+                });
+                console.log("err", err)
+            }
+        })
+    }))
+
+
+    $("#compare").click(function (e) {
+        // $(".ifzero").html("fetching");
+        $("#compare").css({
+            "display": "none"
+        });
+        let bank_id = "Withdrawal Id";
+        let cashfree_id = "Cashfree TransferId";
+        let amount = "amount";
+        let cashfreeId = "Transfer Id";
+        let cashfreeamount = "Amount (in Rs.)"; //Amount//Amount (in Rs.)
+        let bankId = "Narration"; //DESCRIPTION//Narration
+        let bankamount = "Withdrawal Amt."; //DEBITS//Withdrawal Amt.
+        let file1 = "public/uploads/pushpender/Withdrawal_Admin.xlsx";
+        let file2 = "public/uploads/pushpender/Withdrawal_cashfree.xlsx";
+        let file3 = "public/uploads/pushpender/Withdrawal_bank.xlsx";
+
+        // let bank_id = $("#file_1 :selected").text();
+        // let cashfree_id = $("#file_2 :selected").text();
+        // let amount = $("#file_3 :selected").text();
+        // let cashfreeId = $("#cash_1 :selected").text();
+        // let cashfreeamount = $("#cash_2 :selected").text();
+        // let bankId = $("#bank_1 :selected").text();
+        // let bankamount = $("#bank_2 :selected").text();
+
+        if (bank_id == '') {
+            alert("Enter bank_id");
+            exit();
+        }
+        if (cashfree_id == '') {
+            alert("enter cashfree_id");
+            exit();
+        }
+        if (amount == '') {
+            alert("enter amount");
+            exit();
+        }
+        if (cashfreeId == '') {
+            alert("enter cashfreeId");
+            exit();
+        }
+        if (cashfreeamount == '') {
+            alert("enter cashfreeamount");
+            exit();
+        }
+        if (bank_id == '') {
+            alert("enter bank_id");
+            exit();
+        }
+        if (bankamount == '') {
+            alert("enter bankamount");
+            exit();
+        }
+        $.ajax({
+            url: '/withdraw/compare',
+            type: "POST",
+            async: true,
+            data: {
+                admin_bank_id: bank_id,
+                admin_cashfree_id: cashfree_id,
+                admin_amount: amount,
+                cashfree_id: cashfreeId,
+                cashfree_amount: cashfreeamount,
+                bank_id: bankId,
+                bank_amount: bankamount,
+                // file1: $("#file1").val(),
+                // file2: $("#file2").val(),
+                // file3: $("#file3").val()
+            },
+            success: function (data) {
+                if (data.success) {
+                    // $(".popup-div").css({
+                    //     "display": "none"
+                    // })
+                    $(".prog_text_div").css("display", "none");
+                    $("#cashfree_csv").html(data.cashfree_html)
+                    $("#admin_csv").html(data.admin_html)
+                    $("#bank_csv").html(data.bank_html)
+                    $("#cashfree_download").attr("href", "/withdraw/" + data.userName +
+                        "/cashfree.csv");
+                    $("#bank_download").attr("href", "/withdraw/" + data.userName + "/bank.csv");
+                    $("#admin_download").attr("href", "/withdraw/" + data.userName + "/admin.csv");
+                    $("#table_reconcile").css({
+                        "display": "block"
+                    });
+                    $(".upload_files").css({
+                        "display": "none"
+                    });
+                    $("#total_admin_match").html(data.admin_count),
+                        $("#total_cashfree_match").html(data.cashfree_count),
+                        $("#total_bank_match").html(data.bank_count),
+                        $("#cashfree_total").html(data.cashfree_amount_total),
+                        $("#bank_total").html(data.bank_amount_total),
+                        $("#admin_same_total").html(data.admin_amount_total)
+                    // $(".ifzero").html("");
+
+                }
+            },
+            error: function (err) {
+                // alert("errr", err);
+                console.log("errr", err)
+            }
+        });
+
+    });
+
+    $('#admin_filename').change(
+        function () {
+            if ($(this).val()) {
+                $('.1_disable').attr('disabled', false);
+            }
+        }
+    );
+    $("#cashfree_filename").change(
+        function () {
+            if ($(this).val()) {
+                $('.2_disable').attr('disabled', false);
+            }
+        }
+    );
+    $("#bank_filename").change(
+        function () {
+            if ($(this).val()) {
+                $('.3_disable').attr('disabled', false);
+            }
+        }
+    );
+
+    var myVar
+
+    function calling_fun() {
+        // $(".popup-div").css({
+        //     "display": "block"
+        // })
+        // $(".ifzero").html("fetching");
+        $(".prog_text_div").css("display", "block");
+        myVar = setInterval(start_progress, 1000)
+    }
+
+    function start_progress() {
+
+        $.ajax({
+            url: '/withdraw/get_parsing_status', //'/withdraw/compare',
+            type: 'GET',
+            success: function (data) {
+                console.log(data)
+                if (data.success) {
+                    if (data.total_percent != 100) {
+                        // $(".popup-div").css({
+                        //     "display": "block"
+                        // })
+
+                        // $(".auto_progress").attr({
+                        //     "data-value": data.total_percent
+                        // })
+                        // $(".prog_val").html(parseInt(data.total_percent))
+                        // prog_load()
+                        $(".prog_text").html(parseInt(data.total_percent));
+                    } else if (data.total_percent == 100) {
+
+                        clearInterval(myVar)
+                    }
+                }
+            },
+            error: function (err) {
+                clearInterval(myVar);
+                console.log(err, "errr")
+            }
+        })
+    }
+
+    // ============================progressloader==========================
+    // function prog_load() {
+    //     $(".progress").each(function () {
+    //         var value = $(this).attr('data-value');
+    //         var left = $(this).find('.progress-left .progress-bar');
+    //         var right = $(this).find('.progress-right .progress-bar');
+
+    //         if (value > 0) {
+    //             if (value <= 50) {
+    //                 right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
+    //             } else {
+    //                 right.css('transform', 'rotate(180deg)')
+    //                 left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
+    //             }
+    //         }
+    //     })
+
+    // }
+
+    // function percentageToDegrees(percentage) {
+    //     return percentage / 100 * 360
+    // }
+</script>
+
+</html>
